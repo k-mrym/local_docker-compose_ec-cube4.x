@@ -1,0 +1,36 @@
+version: '3'
+
+volumes:
+  ec-cube_var:
+    driver: local
+  ec-cube_vendor:
+    driver: local
+services:
+  ec-cube:
+    build:
+      context: ./app/
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./html:/var/www/html/:cached
+      ### Remove /var & /vendor To volumes ###
+      - ec-cube_var:/var/www/html/var/
+      - ec-cube_vendor:/var/www/html/vendor/
+  ec-cube_mysql:
+    image: mysql:5.7
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_USER: user
+      MYSQL_PASSWORD: test
+      MYSQL_ROOT_PASSWORD: test
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+  mailcatcher:
+    image: schickling/mailcatcher
+    container_name: smtp
+    ports:
+      - 1080:1080
+      - 1025:1025
